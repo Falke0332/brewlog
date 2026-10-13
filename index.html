@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>抽出ログ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Shippori+Mincho:wght@600&display=swap">
+<style>
+:root{--bg:#F1F2EE;--card:#FBFBF9;--ink:#1E2723;--sub:#69736D;--line:#D8DBD3;--acc:#8A5330;--soft:#E8DED6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151A17;--card:#1E2420;--ink:#E8EBE6;--sub:#98A39C;--line:#333B36;--soft:#2E2924}}
+:root[data-theme="dark"]{--bg:#151A17;--card:#1E2420;--ink:#E8EBE6;--sub:#98A39C;--line:#333B36;--soft:#2E2924}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body[data-k="tea"]{--acc:#3F7A47;--soft:#DCE8DB}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body[data-k="tea"]{--soft:#222E24}}
+:root[data-theme="dark"] body[data-k="tea"]{--soft:#222E24}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Zen Kaku Gothic New",system-ui,sans-serif}
+main{max-width:560px;margin:0 auto;padding:16px 16px 96px}
+h1{font:600 22px "Shippori Mincho",serif;margin:4px 0 14px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:14px}
+.seg button{flex:1;border:0;background:none;color:var(--sub);font:inherit;font-weight:700;padding:9px;border-radius:9px}
+.seg button.on{background:var(--acc);color:#fff}
+.timer{display:flex;align-items:center;justify-content:space-between;background:var(--soft);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.timer output{font:600 52px/1 "Shippori Mincho",serif;letter-spacing:.02em}
+.timer div{display:flex;gap:8px}
+button{font:inherit;cursor:pointer}
+.btn{border:0;background:var(--acc);color:#fff;font-weight:700;padding:10px 16px;border-radius:10px}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:13px;color:var(--sub);margin-bottom:10px}
+input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.photo{position:relative;display:flex;align-items:center;justify-content:center;min-height:96px;border:1px dashed var(--line);border-radius:12px;overflow:hidden;color:var(--sub);margin-bottom:10px}
+.photo input{position:absolute;inset:0;opacity:0;margin:0;height:100%;cursor:pointer}
+.pvs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}.pvs div{position:relative}.pvs img{display:block;width:88px;height:88px;object-fit:cover;border-radius:10px}
+.pvs button{position:absolute;top:3px;right:3px;width:24px;height:24px;border:0;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;line-height:1;padding:0}
+.two{display:flex;gap:6px}
+.lbl{font-size:13px;color:var(--sub);margin:6px 0 2px}
+.tr{display:flex;align-items:center;justify-content:space-between}.tr span{font-size:15px}
+.stars.sm{margin:0}.stars.sm button{font-size:26px;padding:3px 2px}
+.tt{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;font-size:13px;color:var(--sub);margin:6px 0}.tt span{display:flex;justify-content:space-between;gap:6px}.tt b{color:var(--acc);font-weight:400;letter-spacing:1px;white-space:nowrap}
+.stars{display:flex;gap:2px;margin:0 0 14px}
+.stars button{border:0;background:none;font-size:30px;line-height:1;color:var(--line);padding:2px}
+.stars button.on{color:var(--acc)}
+#save{width:100%;padding:13px;font-size:17px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;color:var(--sub);font-weight:700;padding:14px}
+nav button.on{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
+.filters{display:flex;gap:8px;margin-bottom:12px}
+.filters select{margin:0;width:auto}.filters input{margin:0}
+.rec{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.rec img{display:block;width:100%;max-height:220px;object-fit:cover}
+.rec .b{padding:12px 14px}
+.ph{display:flex;gap:2px;overflow-x:auto;scroll-snap-type:x mandatory}.ph img{flex:0 0 88%;scroll-snap-align:start}.ph img:only-child{flex-basis:100%}
+.rec h3{margin:0;font-size:17px}
+.rec .m{color:var(--sub);font-size:13px}
+.stats{display:flex;flex-wrap:wrap;gap:6px 14px;margin:8px 0;font-weight:700}
+.stats span small{display:block;font-weight:400;color:var(--sub);font-size:11px}
+.rec p{margin:6px 0;font-size:14px;white-space:pre-wrap}
+.rec .act{display:flex;gap:8px;margin-top:8px}
+.rec .act .btn{padding:7px 12px;font-size:14px}
+.empty{text-align:center;color:var(--sub);padding:40px 0}
+.bk{margin-top:24px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card)}.bk h2{font-size:15px;margin:0 0 4px}.bk p{font-size:13px;color:var(--sub);margin:0 0 10px}.bk div{display:flex;gap:8px}
+#toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body data-k="coffee">
+<main>
+<section id="v-new">
+<h1>抽出を記録</h1>
+<div class="seg" id="kind"><button class="on" data-k="coffee">コーヒー</button><button data-k="tea">お茶</button></div>
+
+<div class="grid">
+<label>湯温（℃）<input id="temp" type="number" inputmode="decimal"></label>
+<label>湯量（ml）<input id="water" type="number" inputmode="decimal"></label>
+<label><span id="dl">粉の量（g）</span><input id="dose" type="number" inputmode="decimal"></label>
+<label>抽出時間（分 / 秒）<span class="two"><input id="min" type="number" inputmode="numeric" min="0" placeholder="分"><input id="sec" type="number" inputmode="numeric" min="0" max="59" placeholder="秒"></span></label>
+</div>
+<label>銘柄・名前<input id="name" list="l-name"></label>
+<div class="grid">
+<label>品種<input id="variety" list="l-variety"></label>
+<label>産地<input id="origin" list="l-origin"></label>
+</div>
+<label>淹れ方<input id="method" list="l-method"></label>
+<label id="ex-c">挽き目<select id="grind"><option value="">未選択</option><option>極細挽き</option><option>細挽き</option><option>中細挽き</option><option>中挽き</option><option>粗挽き</option></select></label>
+<label id="ex-t" hidden>何煎目<input id="steep" type="number" inputmode="numeric" min="1" placeholder="1"></label>
+<div class="pvs" id="pvs"></div>
+<label class="photo" style="font-size:15px"><input type="file" id="photo" accept="image/*" multiple><span>＋ 写真を追加（複数選べます）</span></label>
+<label>メモ<textarea id="note" rows="3" placeholder="味、香り、次に変えたいこと"></textarea></label>
+<div class="lbl">味の評価</div><div id="tastes"></div>
+<div class="lbl">総合評価</div><div class="stars" id="stars" aria-label="総合評価"></div>
+<button class="btn" id="save">記録を保存</button>
+<datalist id="l-name"></datalist><datalist id="l-variety"></datalist><datalist id="l-origin"></datalist><datalist id="l-method"></datalist>
+</section>
+<section id="v-log" hidden>
+<h1>履歴</h1>
+<div class="filters"><select id="f-kind"><option value="">すべて</option><option value="coffee">コーヒー</option><option value="tea">お茶</option></select><input id="f-q" type="search" placeholder="銘柄・産地・品種で検索"></div>
+<div id="list"></div>
+<section class="bk"><h2>バックアップ</h2><p>記録はこの端末のブラウザ内だけに保存されています。ブラウザのデータを消す前や機種変更の前に書き出し、新しい端末で読み込んでください。</p><div><button class="btn ghost" id="exp">書き出す</button><button class="btn ghost" id="imp-b">読み込む</button></div><input type="file" id="imp" accept=".json,application/json" style="display:none"></section>
+</section>
+</main>
+<div id="toast" role="status"></div>
+<nav><button class="on" data-v="new">記録</button><button data-v="log">履歴</button></nav>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const KN={coffee:'コーヒー',tea:'お茶'};
+const METHODS={coffee:['ハンドドリップ','エアロプレス','フレンチプレス','エスプレッソ','水出し'],tea:['急須','水出し','ティーポット','ガラスポット','マグ']};
+let kind='coffee',rating=0,photos=[],tastes={},recs=[],db=null,del=null;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+/* storage */
+function openDb(){return new Promise(r=>{try{const q=indexedDB.open('brewlog',1);q.onupgradeneeded=()=>q.result.createObjectStore('r',{keyPath:'id'});q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}})}
+const tx=(m,f)=>new Promise(r=>{if(!db)return r(null);try{const q=f(db.transaction('r',m).objectStore('r'));q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
+/* kind */
+function setKind(k){if(k!==kind)tastes={};kind=k;document.body.dataset.k=k;$$('#kind button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+$('#dl').textContent=k==='coffee'?'粉の量（g）':'茶葉の量（g）';$('#temp').placeholder=k==='coffee'?'92':'80';
+$('#ex-c').hidden=k!=='coffee';$('#ex-t').hidden=k!=='tea';lists();drawTastes()}
+function lists(){const of=f=>[...new Set(recs.filter(r=>r.kind===kind&&r[f]).map(r=>r[f]))];
+const fill=(id,a)=>$(id).innerHTML=a.map(v=>`<option value="${esc(v)}">`).join('');
+fill('#l-name',of('name'));fill('#l-variety',of('variety'));fill('#l-origin',of('origin'));fill('#l-method',[...new Set([...METHODS[kind],...of('method')])])}
+$$('#kind button').forEach(b=>b.onclick=()=>setKind(b.dataset.k));
+/* stars */
+$('#stars').innerHTML=[1,2,3,4,5].map(n=>`<button data-n="${n}" aria-label="${n}点">★</button>`).join('');
+function stars(n){rating=n;$$('#stars button').forEach(b=>b.classList.toggle('on',+b.dataset.n<=n))}
+$$('#stars button').forEach(b=>b.onclick=()=>stars(+b.dataset.n===rating?0:+b.dataset.n));
+/* tastes */
+const TASTE={coffee:['香り','ボディ感','酸味','苦味','アフターテイスト'],tea:['香り','渋み・苦味','甘み・旨み','水色','アフターテイスト']};
+function drawTastes(){$('#tastes').innerHTML=TASTE[kind].map((n,i)=>`<div class="tr"><span>${n}</span><div class="stars sm">${[1,2,3,4,5].map(v=>`<button type="button" data-t="${i}" data-v="${v}" class="${(tastes[n]||0)>=v?'on':''}" aria-label="${n} ${v}点">★</button>`).join('')}</div></div>`).join('');
+$$('#tastes button').forEach(b=>b.onclick=()=>{const n=TASTE[kind][+b.dataset.t],v=+b.dataset.v;if(tastes[n]===v)delete tastes[n];else tastes[n]=v;drawTastes()})}
+/* photo */
+function pvs(){$('#pvs').innerHTML=photos.map((p,i)=>`<div><img src="${p}" alt="写真${i+1}"><button type="button" data-x="${i}" aria-label="この写真を外す">×</button></div>`).join('');$$('[data-x]').forEach(b=>b.onclick=()=>{photos.splice(+b.dataset.x,1);pvs()})}
+$('#photo').onchange=e=>{[...e.target.files].forEach(f=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);photos.push(c.toDataURL('image/jpeg',.75));pvs()};im.src=fr.result};fr.readAsDataURL(f)});e.target.value=''};
+/* save */
+const ids=['temp','water','dose','min','sec','name','variety','origin','method','note','grind','steep'];
+function clearForm(){ids.forEach(i=>$('#'+i).value='');photos=[];tastes={};drawTastes();pvs();$('#photo').value='';stars(0)}
+$('#save').onclick=async()=>{
+const r={id:Date.now(),kind,rating,tastes:{...tastes},photos:photos.slice()};ids.forEach(i=>r[i]=$('#'+i).value.trim());r.sec=String((+r.min||0)*60+(+r.sec||0)||'');delete r.min;
+if(!(r.temp||r.water||r.dose||r.sec||r.name)){toast('湯温・湯量・粉量・時間・銘柄のどれかを入力してください');return}
+recs.unshift(r);const ok=await tx('readwrite',s=>s.put(r));
+clearForm();lists();render();view('log');toast(ok===null&&!db?'保存しました（このブラウザでは端末に残りません）':'保存しました')};
+/* views */
+function view(v){$('#v-new').hidden=v!=='new';$('#v-log').hidden=v!=='log';$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));if(v==='log')render();scrollTo(0,0)}
+$$('nav button').forEach(b=>b.onclick=()=>view(b.dataset.v));
+/* history */
+const ph=r=>{const a=r.photos||(r.photo?[r.photo]:[]);return a.length?`<div class="ph">${a.map(p=>`<img src="${p}" alt="">`).join('')}</div>`:''};
+const tt=r=>{const e=Object.entries(r.tastes||{});return e.length?`<div class="tt">${e.map(([n,v])=>`<span>${esc(n)}<b>${'★'.repeat(v)}${'☆'.repeat(5-v)}</b></span>`).join('')}</div>`:''};
+function render(){const k=$('#f-kind').value,q=$('#f-q').value.trim().toLowerCase();
+const a=recs.filter(r=>(!k||r.kind===k)&&(!q||[r.name,r.variety,r.origin,r.method,r.note].join(' ').toLowerCase().includes(q)));
+if(!a.length){$('#list').innerHTML='<div class="empty">まだ記録がありません。<br>「記録」から最初の一杯を残しましょう。</div>';return}
+$('#list').innerHTML=a.map(r=>{const ratio=+r.water&&+r.dose?'1:'+(r.water/r.dose).toFixed(1):'';
+const st=[['湯温',r.temp&&r.temp+'℃'],['湯量',r.water&&r.water+'ml'],[r.kind==='tea'?'茶葉':'粉',r.dose&&r.dose+'g'],['時間',+r.sec&&fmt(+r.sec)],['比率',ratio]].filter(x=>x[1]).map(x=>`<span><small>${x[0]}</small>${esc(x[1])}</span>`).join('');
+const meta=[KN[r.kind],r.variety,r.origin,r.method,r.grind,r.steep&&r.steep+'煎目'].filter(Boolean).join('／');
+return `<article class="rec">${ph(r)}<div class="b"><h3>${esc(r.name||KN[r.kind])} ${'★'.repeat(r.rating)}</h3><div class="m">${new Date(r.id).toLocaleString('ja-JP',{dateStyle:'medium',timeStyle:'short'})}</div><div class="m">${esc(meta)}</div><div class="stats">${st}</div>${tt(r)}${r.note?`<p>${esc(r.note)}</p>`:''}<div class="act"><button class="btn ghost" data-c="${r.id}">同じ条件で記録</button><button class="btn ghost" data-d="${r.id}">削除</button></div></div></article>`}).join('');
+$$('[data-c]').forEach(b=>b.onclick=()=>copy(+b.dataset.c));
+$$('[data-d]').forEach(b=>b.onclick=()=>remove(b))}
+function copy(id){const r=recs.find(x=>x.id===id);if(!r)return;setKind(r.kind);ids.forEach(i=>{if(i!=='note')$('#'+i).value=r[i]||''});const s=+r.sec||0;$('#min').value=s?Math.floor(s/60):'';$('#sec').value=s?s%60:'';view('new');toast('条件をコピーしました')}
+async function remove(b){const id=+b.dataset.d;if(del!==id){del=id;b.textContent='もう一度で削除';setTimeout(()=>{if(del===id){del=null;b.textContent='削除'}},3000);return}
+recs=recs.filter(x=>x.id!==id);del=null;await tx('readwrite',s=>s.delete(id));lists();render()}
+/* backup */
+async function exportData(){
+if(!recs.length){toast('書き出す記録がありません');return}
+const data=JSON.stringify({app:'brewlog',v:1,exported:Date.now(),records:recs}),name='brewlog-backup-'+new Date().toISOString().slice(0,10)+'.json';
+let dl=null;try{dl=window.claude?await claude.use('downloads'):null}catch(e){}
+if(dl){try{await dl.save({filename:name,data});toast('バックアップを保存しました')}catch(e){if(!e||e.code!=='declined')toast('保存できませんでした')}return}
+try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast('バックアップを書き出しました')}catch(e){toast('書き出せませんでした')}}
+$('#exp').onclick=exportData;
+$('#imp-b').onclick=()=>$('#imp').click();
+$('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=async()=>{try{const j=JSON.parse(fr.result),a=Array.isArray(j)?j:j.records;if(!Array.isArray(a))throw 0;const have=new Set(recs.map(r=>r.id));let n=0;for(const r of a){if(!r||typeof r.id!=='number'||have.has(r.id)||!KN[r.kind])continue;recs.push(r);have.add(r.id);await tx('readwrite',s=>s.put(r));n++}recs.sort((x,y)=>y.id-x.id);lists();render();toast(n+'件を読み込みました（重複は除外）')}catch(err){toast('読み込めませんでした。バックアップファイルを確認してください')}};fr.readAsText(f);e.target.value=''};
+$('#f-kind').onchange=render;$('#f-q').oninput=render;
+(async()=>{db=await openDb();recs=((await tx('readonly',s=>s.getAll()))||[]).sort((a,b)=>b.id-a.id);setKind('coffee');render()})();
+</script>
+</body>
+</html>
