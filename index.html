@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="抽出ログ">
+<meta name="theme-color" content="#8A5330">
 <title>抽出ログ</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Shippori+Mincho:wght@600&display=swap">
 <style>
@@ -172,6 +178,7 @@ $('#imp-b').onclick=()=>$('#imp').click();
 $('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=async()=>{try{const j=JSON.parse(fr.result),a=Array.isArray(j)?j:j.records;if(!Array.isArray(a))throw 0;const have=new Set(recs.map(r=>r.id));let n=0;for(const r of a){if(!r||typeof r.id!=='number'||have.has(r.id)||!KN[r.kind])continue;recs.push(r);have.add(r.id);await tx('readwrite',s=>s.put(r));n++}recs.sort((x,y)=>y.id-x.id);lists();render();toast(n+'件を読み込みました（重複は除外）')}catch(err){toast('読み込めませんでした。バックアップファイルを確認してください')}};fr.readAsText(f);e.target.value=''};
 $('#f-kind').onchange=render;$('#f-q').oninput=render;
 (async()=>{db=await openDb();recs=((await tx('readonly',s=>s.getAll()))||[]).sort((a,b)=>b.id-a.id);setKind('coffee');render()})();
+if('serviceWorker' in navigator){addEventListener('load',()=>{try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}})}
 </script>
 </body>
 </html>
